@@ -160,6 +160,7 @@ static void free_pieces(void)
 
 	free(pieces);
 	npieces = spieces = 0;
+	pieces = NULL;
 }
 
 // Write info dictionary for a single file. The struct stat is passed along
