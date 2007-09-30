@@ -129,7 +129,10 @@ static void finalize_pieces(void)
 	if (thispiece_len > 0)
 		add_this_piece();
 	if (thispiece != NULL)
+	{
 		free(thispiece);
+		thispiece = NULL;
+	}
 	thispiece_len = 0;
 }
 
