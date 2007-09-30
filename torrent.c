@@ -7,6 +7,7 @@
 #include "err.h"
 #include "xm.h"
 #include "sha1lib.h"
+#include "filelist.h"
 
 static char **pieces;
 static int npieces, spieces;
@@ -40,6 +41,29 @@ static int thispiece_len;
 // Piece being constructed so far.
 // Can be NULL if thispiece_len == 0.
 static unsigned char *thispiece;
+
+// Write a path as a list of the components.
+static void fbenc_path(const char *path)
+{
+	char *copy;
+	char *next;
+	char *p;
+
+	fprintf(stderr, "writing path: %s\n", path); // Tgk
+	p = copy = xsd(path);
+
+	fbenc_list;
+	while ((next = strchr(p, '/')) != NULL)
+	{
+		*next = '\0';
+		fbenc_str(p);
+		p = next + 1;
+	}
+	fbenc_str(p);
+	fbenc_end;
+
+	free(copy);
+}
 
 // Add hash of the piece being constructed in memory.
 static void add_this_piece(void)
@@ -159,7 +183,64 @@ static void write_singlefile_info(const char *filename, const struct stat *sb)
 static void write_multifile_info(const char *dirname,
 	int num_ignore_patterns, const char **ignore_patterns)
 {
-	// TODO: write this
+	const char **files;
+	int numfiles;
+	int ix;
+	struct stat info;
+	char *fullfilename;
+
+	getfilelist(&files, &numfiles, dirname,
+		ignore_patterns, num_ignore_patterns);
+
+	fbenc_dict;
+
+	fbenc_str("files");
+	fbenc_list;
+	for (ix = 0; ix < numfiles; ix++)
+	{
+		fullfilename = xm(1, strlen(dirname) + 1 + strlen(files[ix])
+			+ 1);
+		strcpy(fullfilename, dirname);
+		strcat(fullfilename, "/");
+		strcat(fullfilename, files[ix]);
+
+		if (stat(fullfilename, &info) != 0)
+			err(1, "cannot stat %s", fullfilename);
+
+		fbenc_dict;
+
+		fbenc_str("length");
+		fbenc_int(info.st_size);
+
+		fbenc_str("path");
+		fbenc_path(files[ix]);
+
+		fbenc_end;
+
+		add_pieces_from_file(fullfilename);
+		free(fullfilename);
+	}
+	fbenc_end; // end the list of files
+
+	freefilelist();
+
+	fbenc_str("name");
+	fbenc_str(newname);
+
+	fbenc_str("piece length");
+	fbenc_int(piece_bytes);
+
+	finalize_pieces();
+	write_pieces();
+	free_pieces();
+
+	if (mark_private)
+	{
+		fbenc_str("private");
+		fbenc_int(1);
+	}
+
+	fbenc_end;
 }
 
 void create_torrent(const char *filename, const char *inputfile,
