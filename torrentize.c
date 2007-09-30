@@ -6,11 +6,11 @@
 #include "xm.h"
 #include "torrent.h"
 
-#define DEFAULT_BLOCKSIZE 256
+#define DEFAULT_PIECESIZE 256
 
 const struct option opts[] =
 {
-	{ "block-size",		required_argument,	NULL, 'b' },
+	{ "piece-size",		required_argument,	NULL, 'b' },
 	{ "ignore",		required_argument,	NULL, 'i' },
 	{ "output-name",	required_argument,	NULL, 'o' },
 	{ "private",		no_argument,		NULL, 'p' },
@@ -23,7 +23,7 @@ static void usage(void)
 	fprintf(stderr,
 		"usage: torrentize [options] tracker_URL ... file ...\n"
 		"\n"
-		"-b, --block-size KB: Set block size in kilobytes.\n"
+		"-b, --piece-size KB: Set piece size in kilobytes.\n"
 		"-i, --ignore pattern: Ignore wildcard pattern.\n"
 		"-o, --output-name file: Set output filename or directory.\n"
 		"-p, --private: Mark torrent private.\n"
@@ -34,7 +34,7 @@ static void usage(void)
 
 #define MAX_IGNORE_PATTERNS 256
 
-static int blocksize = DEFAULT_BLOCKSIZE;
+static int piecesize = DEFAULT_PIECESIZE;
 static int mark_private = 0;
 static int quiet = 0;
 static char *topdir_name = NULL;
@@ -54,13 +54,13 @@ static void read_options(int argc, char *argv[])
 	while ((ret = getopt_long(argc, argv, "b:i:o:pqR:", opts, NULL))
 		!= -1)
 	{
-		if (ret == 'b') // set block size in KB
+		if (ret == 'b') // set piece size in KB
 		{
-			blocksize = atoi(optarg);
-			if (blocksize < 1)
+			piecesize = atoi(optarg);
+			if (piecesize < 1)
 			{
-				errx(1, "impossible block size: %d KB\n",
-					blocksize);
+				errx(1, "impossible piece size: %d KB\n",
+					piecesize);
 			}
 		}
 		else if (ret == 'i') // ignore pattern
