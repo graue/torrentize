@@ -187,12 +187,17 @@ void create_torrent(const char *filename, const char *inputfile,
 
 	if (num_tracker_urls > 1)
 	{
+		// XXX only support each tracker being put in its own tier
+		// for the moment
+
 		fbenc_str("announce-list");
 		fbenc_list;
-		fbenc_list; // XXX only support one tier for now
 		for (ix = 0; ix < num_tracker_urls; ix++)
+		{
+			fbenc_list;
 			fbenc_str(tracker_urls[ix]);
-		fbenc_end;
+			fbenc_end;
+		}
 		fbenc_end;
 	}
 
