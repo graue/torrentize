@@ -71,6 +71,11 @@ static void add_dir(const char *dirname, const char *prefix)
 		err(1, "cannot close directory %s", dirname);
 }
 
+int mystrcmp(const void *one, const void *two)
+{
+	return strcmp(*(const char **)one, *(const char **)two);
+}
+
 void getfilelist(const char ***files, int *numfiles, const char *dirname,
 	const char **ignore_patterns, int num_ignore_patterns)
 {
@@ -83,7 +88,7 @@ void getfilelist(const char ***files, int *numfiles, const char *dirname,
 
 	add_dir(dirname, "");
 
-	// TODO: sort filenames
+	qsort(fnams, nfnams, sizeof fnams[0], mystrcmp);
 
 	*files = (const char **)fnams;
 	*numfiles = nfnams;
