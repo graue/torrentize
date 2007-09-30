@@ -62,8 +62,10 @@ static void add_dir(const char *dirname, const char *prefix)
 		}
 		else
 		{
-			warnx("\rskipping non-regular file %s/%s",
-				newdirname, de->d_name);
+			warnx("\rskipping non-regular file %s%s%s",
+				prefix,
+				strlen(prefix) == 0 ? "" : "/",
+				de->d_name);
 		}
 	}
 
