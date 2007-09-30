@@ -9,3 +9,4 @@ Untested:
 
 Limitations:
  * doesn't work on big endian systems yet
+ * with multi-tracker, only one tracker can be placed in each tier
