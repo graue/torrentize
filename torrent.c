@@ -49,7 +49,6 @@ static void fbenc_path(const char *path)
 	char *next;
 	char *p;
 
-	fprintf(stderr, "writing path: %s\n", path); // Tgk
 	p = copy = xsd(path);
 
 	fbenc_list;
@@ -77,7 +76,9 @@ static void add_this_piece(void)
 }
 
 // Add pieces from a file.
-static void add_pieces_from_file(const char *filename)
+// The second filename is only for display purposes.
+static void add_pieces_from_file(const char *filename,
+	const char *displayfilename)
 {
 	FILE *infp;
 	int wantedbytes;
@@ -90,6 +91,12 @@ static void add_pieces_from_file(const char *filename)
 	}
 
 	infp = fopen(filename, "rb");
+	if (infp == NULL)
+		err(1, "cannot open %s", filename);
+
+	if (!be_quiet)
+		fprintf(stderr, "  adding: %s", displayfilename);
+
 	wantedbytes = piece_bytes - thispiece_len;
 	while ((ret = fread(&thispiece[thispiece_len], 1, wantedbytes, infp))
 		> 0)
@@ -106,9 +113,14 @@ static void add_pieces_from_file(const char *filename)
 			wantedbytes = piece_bytes;
 		}
 	}
+
+	if (!be_quiet)
+		putc('\n', stderr);
+
 	if (ferror(infp))
 		err(1, "error reading %s", filename);
 	fclose(infp);
+
 }
 
 // Add the final piece, in case the torrent isn't an exact multiple
@@ -165,7 +177,7 @@ static void write_singlefile_info(const char *filename, const struct stat *sb)
 	fbenc_str("piece length");
 	fbenc_int(piece_bytes);
 
-	add_pieces_from_file(filename);
+	add_pieces_from_file(filename, filename);
 	finalize_pieces();
 	write_pieces();
 	free_pieces();
@@ -217,7 +229,7 @@ static void write_multifile_info(const char *dirname,
 
 		fbenc_end;
 
-		add_pieces_from_file(fullfilename);
+		add_pieces_from_file(fullfilename, files[ix]);
 		free(fullfilename);
 	}
 	fbenc_end; // end the list of files

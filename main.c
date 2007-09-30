@@ -169,6 +169,9 @@ static void do_torrent(const char *inputfile)
 		}
 	}
 
+	if (!quiet)
+		fprintf(stderr, "%s:\n", outfile);
+
 	create_torrent(outfile, inputfile, renamedname, piecesize, mark_private,
 		quiet, num_tracker_urls, (const char *const *)tracker_urls,
 		num_ignore_patterns, (const char *const *)ignore_patterns);
@@ -185,7 +188,11 @@ int main(int argc, char *argv[])
 	read_args(argc, argv);
 
 	for (ix = 0; ix < num_input_files; ix++)
+	{
 		do_torrent(input_files[ix]);
+		if (ix < num_input_files - 1)
+			putc('\n', stderr);
+	}
 
 	return 0;
 }
