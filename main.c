@@ -31,6 +31,7 @@ static void usage(void)
 		"-q, --quiet: Don't print progress indicator.\n"
 		"-R, --rename name: Rename file or top dir for torrent.\n"
 	);
+	exit(1);
 }
 
 #define MAX_IGNORE_PATTERNS 256
