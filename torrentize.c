@@ -15,7 +15,7 @@ const struct option opts[] =
 	{ "output-name",	required_argument,	NULL, 'o' },
 	{ "private",		no_argument,		NULL, 'p' },
 	{ "quiet",		no_argument,		NULL, 'q' },
-	{ "rename-topdir",	required_argument,	NULL, 'R' }
+	{ "rename",		required_argument,	NULL, 'R' }
 };
 
 static void usage(void)
@@ -28,7 +28,7 @@ static void usage(void)
 		"-o, --output-name file: Set output filename or directory.\n"
 		"-p, --private: Mark torrent private.\n"
 		"-q, --quiet: Don't print progress indicator.\n"
-		"-R, --rename-topdir name: Rename torrent top dir.\n"
+		"-R, --rename name: Rename file or top dir for torrent.\n"
 	);
 }
 
@@ -37,7 +37,7 @@ static void usage(void)
 static int piecesize = DEFAULT_PIECESIZE;
 static int mark_private = 0;
 static int quiet = 0;
-static char *topdir_name = NULL;
+static char *newname = NULL;
 static char *outpath = NULL;
 static char *ignore_patterns[MAX_IGNORE_PATTERNS];
 static int num_ignore_patterns = 0;
@@ -75,8 +75,8 @@ static void read_options(int argc, char *argv[])
 			mark_private = 1;
 		else if (ret == 'q') // quiet: no progress indicator
 			quiet = 1;
-		else if (ret == 'R') // rename topdir
-			topdir_name = optarg;
+		else if (ret == 'R') // rename topdir or file
+			newname = optarg;
 		else // ':' or '?'
 			usage();
 	}
@@ -153,7 +153,7 @@ static void do_torrent(const char *inputfile)
 		strcat(outfile, ".torrent");
 	}
 
-	create_torrent(outfile, inputfile, topdir_name, mark_private,
+	create_torrent(outfile, inputfile, newname, piecesize, mark_private,
 		quiet, num_tracker_urls, (const char *const *)tracker_urls,
 		num_ignore_patterns, (const char *const *)ignore_patterns);
 	free(outfile);
