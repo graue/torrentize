@@ -120,7 +120,6 @@ static void add_pieces_from_file(const char *filename,
 	if (ferror(infp))
 		err(1, "error reading %s", filename);
 	fclose(infp);
-
 }
 
 // Add the final piece, in case the torrent isn't an exact multiple
