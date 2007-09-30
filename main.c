@@ -100,7 +100,7 @@ static void read_args(int argc, char *argv[])
 		argc--;
 	}
 
-	if (tracker_urls == 0)
+	if (num_tracker_urls == 0)
 	{
 		warnx("no tracker URL given");
 		usage();
