@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 {
 	int ix;
 
-	if (argc < 3)
+	if (argc == 1)
 		usage();
 
 	read_options(argc, argv);
