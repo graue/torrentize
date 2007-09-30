@@ -101,4 +101,5 @@ void freefilelist(void)
 		free(fnams[ix]);
 	free(fnams);
 	nfnams = sfnams = 0;
+	fnams = NULL;
 }
