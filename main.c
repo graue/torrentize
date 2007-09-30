@@ -1,3 +1,5 @@
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -120,6 +122,7 @@ static void do_torrent(const char *inputfile)
 	char *realinputfile;
 	char *p;
 	const char *renamedname;
+	struct stat info;
 
 	// duplicate input file name, removing any trailing slashes
 	realinputfile = xsd(inputfile);
@@ -143,8 +146,14 @@ static void do_torrent(const char *inputfile)
 		strcpy(outfile, realinputfile);
 		strcat(outfile, ".torrent");
 	}
-	else if (num_input_files == 1)
+	else if (num_input_files == 1 && (stat(outpath, &info) == -1
+		|| S_ISREG(info.st_mode)))
+	{
+		// One input file, and outpath is either nonexistent thus far,
+		// or a regular file to be overwritten. Thus treat it as a
+		// filename.
 		outfile = xsd(outpath);
+	}
 	else // outpath is a directory to place torrent files in
 	{
 		char *inputfile_nameonly;
