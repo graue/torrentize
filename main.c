@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <getopt.h>
 #include "err.h"
 #include "xm.h"
@@ -88,10 +89,10 @@ static void read_args(int argc, char *argv[])
 	argv += optind;
 
 	tracker_urls = argv;
-	while (argc > 0 && (strncmp(*argv, "http://", 7)
-			|| strncmp(*argv, "udp://", 6)))
+	while (argc > 0 && (strncmp(*argv, "http://", 7) == 0
+			|| strncmp(*argv, "udp://", 6) == 0))
 	{
-		tracker_urls++;
+		num_tracker_urls++;
 		argv++;
 		argc--;
 	}
@@ -117,6 +118,7 @@ static void do_torrent(const char *inputfile)
 	char *outfile;
 	char *realinputfile;
 	char *p;
+	const char *renamedname;
 
 	// duplicate input file name, removing any trailing slashes
 	realinputfile = xsd(inputfile);
@@ -153,10 +155,26 @@ static void do_torrent(const char *inputfile)
 		strcat(outfile, ".torrent");
 	}
 
-	create_torrent(outfile, inputfile, newname, piecesize, mark_private,
+	if (newname != NULL)
+		renamedname = newname;
+	else
+	{
+		renamedname = strrchr(realinputfile, '/');
+		if (renamedname == NULL)
+			renamedname = realinputfile;
+		else
+		{
+			renamedname++;
+			assert(renamedname[0] != '\0');
+		}
+	}
+
+	create_torrent(outfile, inputfile, renamedname, piecesize, mark_private,
 		quiet, num_tracker_urls, (const char *const *)tracker_urls,
 		num_ignore_patterns, (const char *const *)ignore_patterns);
+
 	free(outfile);
+	free(realinputfile);
 }
 
 int main(int argc, char *argv[])

@@ -109,7 +109,7 @@ static void write_pieces(void)
 	fwr(buf);
 	for (ix = 0; ix < npieces; ix++)
 	{
-		if (fwrite(pieces[ix], 20, 1, stdout) < 1)
+		if (fwrite(pieces[ix], 20, 1, out) < 1)
 			err(1, "error writing to %s", activeoutfile);
 	}
 }
@@ -174,7 +174,7 @@ void create_torrent(const char *filename, const char *inputfile,
 	mark_private = private;
 	be_quiet = quiet;
 	piece_bytes = piecesize * 1024;
-	newname = rename != NULL ? rename : filename;
+	newname = rename != NULL ? rename : inputfile;
 
 	out = fopen(filename, "wb");
 	if (out == NULL)
