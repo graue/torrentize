@@ -147,12 +147,21 @@ static void do_torrent(const char *inputfile)
 		outfile = xsd(outpath);
 	else // outpath is a directory to place torrent files in
 	{
-		outfile = xm(1, strlen(outpath) + 1 + strlen(realinputfile)
+		char *inputfile_nameonly;
+
+		inputfile_nameonly = strrchr(realinputfile, '/');
+		if (inputfile_nameonly == NULL)
+			inputfile_nameonly = realinputfile;
+		else
+			inputfile_nameonly++;
+
+		outfile = xm(1, strlen(outpath) + 1
+			+ strlen(inputfile_nameonly)
 			+ strlen(".torrent") + 1);
 		strcpy(outfile, outpath);
 		if (outfile[strlen(outfile) - 1] != '/')
 			strcat(outfile, "/");
-		strcat(outfile, realinputfile);
+		strcat(outfile, inputfile_nameonly);
 		strcat(outfile, ".torrent");
 	}
 
