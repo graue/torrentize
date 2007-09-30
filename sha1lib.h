@@ -27,7 +27,7 @@ typedef struct {
 void SHA1Init(SHA1_CTX *context);
 void SHA1Update(SHA1_CTX *context, const unsigned char *data, uint32 len);	/* JHB */
 void SHA1Final(unsigned char digest[SHA1_DIGEST_LENGTH], SHA1_CTX *context);
-char *SHA1End(SHA1_CTX *context, char *buf);
-char *SHA1Data(const unsigned char *data, uint32 len, char *buf);
+void SHA1Data(unsigned char digest[SHA1_DIGEST_LENGTH],
+	const unsigned char *data, uint32 len);
 
 #endif

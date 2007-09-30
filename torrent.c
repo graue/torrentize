@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "err.h"
 #include "xm.h"
+#include "sha1lib.h"
 
 static char **pieces;
 static int npieces, spieces;
@@ -29,23 +31,71 @@ static const char *activeoutfile;
 
 static int mark_private;
 static int be_quiet;
-static int piece_size;
+static int piece_bytes;
 static const char *newname;
 
 // Length so far of the piece being constructed.
 static int thispiece_len;
 
+// Piece being constructed so far.
+// Can be NULL if thispiece_len == 0.
+static unsigned char *thispiece;
+
+// Add hash of the piece being constructed in memory.
+static void add_this_piece(void)
+{
+	char *digest;
+
+	XPND(pieces, npieces, spieces);
+	digest = xm(1, SHA1_DIGEST_LENGTH);
+	SHA1Data(digest, thispiece, thispiece_len);
+	pieces[npieces++] = digest;
+}
+
 // Add pieces from a file.
 static void add_pieces_from_file(const char *filename)
 {
-	// TODO: write this
+	FILE *infp;
+	int wantedbytes;
+	int ret;
+
+	if (thispiece == NULL)
+	{
+		assert(thispiece_len == 0);
+		thispiece = xm(1, piece_bytes);
+	}
+
+	infp = fopen(filename, "rb");
+	wantedbytes = piece_bytes - thispiece_len;
+	while ((ret = fread(&thispiece[thispiece_len], 1, wantedbytes, infp))
+		> 0)
+	{
+		assert(ret <= wantedbytes);
+
+		thispiece_len += ret;
+		wantedbytes -= ret;
+
+		if (thispiece_len == piece_bytes)
+		{
+			add_this_piece();
+			thispiece_len = 0;
+			wantedbytes = piece_bytes;
+		}
+	}
+	if (ferror(infp))
+		err(1, "error reading %s", filename);
+	fclose(infp);
 }
 
 // Add the final piece, in case the torrent isn't an exact multiple
 // of the piece size.
 static void finalize_pieces(void)
 {
-	// TODO: write this
+	if (thispiece_len > 0)
+		add_this_piece();
+	if (thispiece != NULL)
+		free(thispiece);
+	thispiece_len = 0;
 }
 
 // Write the pieces' hashes to the torrent file.
@@ -67,6 +117,11 @@ static void write_pieces(void)
 // Free/reset the pieces.
 static void free_pieces(void)
 {
+	int ix;
+
+	for (ix = 0; ix < npieces; ix++)
+		free(pieces[ix]);
+
 	free(pieces);
 	npieces = spieces = 0;
 }
@@ -84,7 +139,7 @@ static void write_singlefile_info(const char *filename, const struct stat *sb)
 	fbenc_str(newname);
 
 	fbenc_str("piece length");
-	fbenc_int(piece_size);
+	fbenc_int(piece_bytes);
 
 	add_pieces_from_file(filename);
 	finalize_pieces();
@@ -118,7 +173,7 @@ void create_torrent(const char *filename, const char *inputfile,
 	activeoutfile = filename;
 	mark_private = private;
 	be_quiet = quiet;
-	piece_size = piecesize;
+	piece_bytes = piecesize * 1024;
 	newname = rename != NULL ? rename : filename;
 
 	out = fopen(filename, "wb");

@@ -246,31 +246,14 @@ void SHA1Final(unsigned char digest[SHA1_DIGEST_LENGTH], SHA1_CTX *context) {
 #endif
 }
 
-char *SHA1End(SHA1_CTX *context, char *buf)
-{
-	const char hex[] = "0123456789abcdef";
-	unsigned char digest[SHA1_DIGEST_LENGTH];
-	int ix;
-	char *p;
-
-	SHA1Final(digest, context);
-	p = buf;
-	for (ix = 0; ix < SHA1_DIGEST_LENGTH; ix++)
-	{
-		*(p++) = hex[digest[ix] >> 4];
-		*(p++) = hex[digest[ix] & 0xf];
-	}
-	*p = '\0';
-	return buf;
-}
-
-char *SHA1Data(const unsigned char *data, uint32 len, char *buf)
+void SHA1Data(unsigned char digest[SHA1_DIGEST_LENGTH],
+	const unsigned char *data, uint32 len)
 {
 	SHA1_CTX context;
 
 	SHA1Init(&context);
 	SHA1Update(&context, data, len);
-	return SHA1End(&context, buf);
+	return SHA1Final(digest, &context);
 }
 
 /*************************************************************/
