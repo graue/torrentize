@@ -67,7 +67,7 @@ static void fbenc_path(const char *path)
 // Add hash of the piece being constructed in memory.
 static void add_this_piece(void)
 {
-	char *digest;
+	unsigned char *digest;
 
 	XPND(pieces, npieces, spieces);
 	digest = xm(1, SHA1_DIGEST_LENGTH);
