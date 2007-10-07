@@ -29,11 +29,15 @@ static void add_dir(const char *dirname, const char *prefix)
 
 	while ((de = readdir(dh)) != NULL)
 	{
+		size_t namlen;
+
 		// TODO: check for wildcard match & skip
+
+		namlen = strlen(de->d_name);
 
 		if (de->d_type == DT_REG)
 		{
-			fname = xm(1, strlen(prefix) + 1 + de->d_namlen + 1);
+			fname = xm(1, strlen(prefix) + 1 + namlen + 1);
 			sprintf(fname, "%s%s%s", prefix,
 				strlen(prefix) == 0 ? "" : "/", de->d_name);
 			XPND(fnams, nfnams, sfnams);
@@ -48,12 +52,12 @@ static void add_dir(const char *dirname, const char *prefix)
 			}
 
 			newprefix = xm(1, strlen(prefix) + 1
-				+ de->d_namlen + 1);
+				+ namlen + 1);
 			sprintf(newprefix, "%s%s%s", prefix,
 				strlen(prefix) == 0 ? "" : "/", de->d_name);
 
 			newdirname = xm(1, strlen(dirname) + 1
-				+ de->d_namlen + 1);
+				+ namlen + 1);
 			sprintf(newdirname, "%s/%s", dirname, de->d_name);
 
 			add_dir(newdirname, newprefix);
