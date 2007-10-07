@@ -9,7 +9,7 @@
 #include "sha1lib.h"
 #include "filelist.h"
 
-static char **pieces;
+static unsigned char **pieces;
 static int npieces, spieces;
 
 static FILE *out;
