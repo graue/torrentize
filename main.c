@@ -140,10 +140,24 @@ static void do_torrent(const char *inputfile)
 	if (realinputfile[0] == '/' && realinputfile[1] == '\0')
 		errx(1, "won't torrent the root directory");
 
+	if (newname != NULL)
+		renamedname = newname;
+	else
+	{
+		renamedname = strrchr(realinputfile, '/');
+		if (renamedname == NULL)
+			renamedname = realinputfile;
+		else
+		{
+			renamedname++;
+			assert(renamedname[0] != '\0');
+		}
+	}
+
 	if (outpath == NULL)
 	{
-		outfile = xm(1, strlen(realinputfile) + strlen(".torrent") + 1);
-		strcpy(outfile, realinputfile);
+		outfile = xm(1, strlen(renamedname) + strlen(".torrent") + 1);
+		strcpy(outfile, renamedname);
 		strcat(outfile, ".torrent");
 	}
 	else if (num_input_files == 1 && (stat(outpath, &info) == -1
@@ -172,20 +186,6 @@ static void do_torrent(const char *inputfile)
 			strcat(outfile, "/");
 		strcat(outfile, inputfile_nameonly);
 		strcat(outfile, ".torrent");
-	}
-
-	if (newname != NULL)
-		renamedname = newname;
-	else
-	{
-		renamedname = strrchr(realinputfile, '/');
-		if (renamedname == NULL)
-			renamedname = realinputfile;
-		else
-		{
-			renamedname++;
-			assert(renamedname[0] != '\0');
-		}
 	}
 
 	if (!quiet)
