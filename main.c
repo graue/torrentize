@@ -172,9 +172,9 @@ static void do_torrent(const char *inputfile)
 	{
 		char *inputfile_nameonly;
 
-		inputfile_nameonly = strrchr(realinputfile, '/');
+		inputfile_nameonly = strrchr(renamedname, '/');
 		if (inputfile_nameonly == NULL)
-			inputfile_nameonly = realinputfile;
+			inputfile_nameonly = renamedname;
 		else
 			inputfile_nameonly++;
 
