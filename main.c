@@ -170,7 +170,7 @@ static void do_torrent(const char *inputfile)
 	}
 	else // outpath is a directory to place torrent files in
 	{
-		char *inputfile_nameonly;
+		const char *inputfile_nameonly;
 
 		inputfile_nameonly = strrchr(renamedname, '/');
 		if (inputfile_nameonly == NULL)
