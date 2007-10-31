@@ -32,6 +32,7 @@ static const char *activeoutfile;
 
 static int mark_private;
 static int be_quiet;
+static int sort_by_ext;
 static int piece_bytes;
 static const char *newname;
 
@@ -204,7 +205,7 @@ static void write_multifile_info(const char *dirname,
 	struct stat info;
 	char *fullfilename;
 
-	getfilelist(&files, &numfiles, dirname,
+	getfilelist(&files, &numfiles, dirname, sort_by_ext,
 		ignore_patterns, num_ignore_patterns);
 
 	fbenc_dict;
@@ -260,6 +261,7 @@ static void write_multifile_info(const char *dirname,
 
 void create_torrent(const char *filename, const char *inputfile,
 	const char *rename, int piecesize, int private, int quiet,
+	int sortext,
 	int num_tracker_urls, const char **tracker_urls,
 	int num_ignore_patterns, const char **ignore_patterns)
 {
@@ -269,6 +271,7 @@ void create_torrent(const char *filename, const char *inputfile,
 	activeoutfile = filename;
 	mark_private = private;
 	be_quiet = quiet;
+	sort_by_ext = sortext;
 	piece_bytes = piecesize * 1024;
 	newname = rename != NULL ? rename : inputfile;
 

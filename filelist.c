@@ -82,7 +82,29 @@ int mystrcmp(const void *one, const void *two)
 	return strcmp(*(const char **)one, *(const char **)two);
 }
 
+// Version that compares extensions first.
+int extstrcmp(const void *one, const void *two)
+{
+	const char *s1, *s2;
+	const char *ext1, *ext2;
+	int ret;
+
+	s1 = *(const char **)one;
+	s2 = *(const char **)two;
+
+	ext1 = strrchr(s1, '.');
+	if (ext1 == NULL) ext1 = s1;
+	ext2 = strrchr(s2, '.');
+	if (ext2 == NULL) ext2 = s2;
+
+	ret = strcmp(ext1, ext2);
+	if (ret == 0)
+		ret = strcmp(s1, s2);
+	return ret;
+}
+
 void getfilelist(const char ***files, int *numfiles, const char *dirname,
+	int sort_by_ext,
 	const char **ignore_patterns, int num_ignore_patterns)
 {
 	assert(fnams == NULL);
@@ -94,7 +116,8 @@ void getfilelist(const char ***files, int *numfiles, const char *dirname,
 
 	add_dir(dirname, "");
 
-	qsort(fnams, nfnams, sizeof fnams[0], mystrcmp);
+	qsort(fnams, nfnams, sizeof fnams[0],
+		sort_by_ext ? extstrcmp : mystrcmp);
 
 	*files = (const char **)fnams;
 	*numfiles = nfnams;

@@ -14,6 +14,7 @@
 const struct option opts[] =
 {
 	{ "piece-size",		required_argument,	NULL, 'b' },
+	{ "sort-by-extensions",	no_argument,		NULL, 'E' },
 	{ "ignore",		required_argument,	NULL, 'i' },
 	{ "output-name",	required_argument,	NULL, 'o' },
 	{ "private",		no_argument,		NULL, 'p' },
@@ -27,6 +28,7 @@ static void usage(void)
 		"usage: torrentize [options] tracker_URL ... file ...\n"
 		"\n"
 		"-b, --piece-size KB: Set piece size in kilobytes.\n"
+		"-E, --sort-by-extensions: Sort by file extensions.\n"
 		"-i, --ignore pattern: Ignore wildcard pattern.\n"
 		"-o, --output-name file: Set output filename or directory.\n"
 		"-p, --private: Mark torrent private.\n"
@@ -41,6 +43,7 @@ static void usage(void)
 static int piecesize = DEFAULT_PIECESIZE;
 static int mark_private = 0;
 static int quiet = 0;
+static int sort_by_ext = 0;
 static char *newname = NULL;
 static char *outpath = NULL;
 static char *ignore_patterns[MAX_IGNORE_PATTERNS];
@@ -55,7 +58,7 @@ static void read_options(int argc, char *argv[])
 {
 	int ret;
 
-	while ((ret = getopt_long(argc, argv, "b:i:o:pqR:", opts, NULL))
+	while ((ret = getopt_long(argc, argv, "b:Ei:o:pqR:", opts, NULL))
 		!= -1)
 	{
 		if (ret == 'b') // set piece size in KB
@@ -67,6 +70,8 @@ static void read_options(int argc, char *argv[])
 					piecesize);
 			}
 		}
+		else if (ret == 'E') // sort by extensions
+			sort_by_ext = 1;
 		else if (ret == 'i') // ignore pattern
 		{
 			if (num_ignore_patterns == MAX_IGNORE_PATTERNS)
@@ -192,7 +197,8 @@ static void do_torrent(const char *inputfile)
 		fprintf(stderr, "%s:\n", outfile);
 
 	create_torrent(outfile, inputfile, renamedname, piecesize, mark_private,
-		quiet, num_tracker_urls, (const char *const *)tracker_urls,
+		quiet, sort_by_ext,
+		num_tracker_urls, (const char *const *)tracker_urls,
 		num_ignore_patterns, (const char *const *)ignore_patterns);
 
 	free(outfile);
