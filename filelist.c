@@ -82,15 +82,38 @@ int mystrcmp(const void *one, const void *two)
 	return strcmp(*(const char **)one, *(const char **)two);
 }
 
-// Version that compares extensions first.
+#undef MIN
+#define MIN(x,y) ((x) < (y) ? (x) : (y))
+
+// Version that compares extensions before rest of filenames.
 int extstrcmp(const void *one, const void *two)
 {
 	const char *s1, *s2;
 	const char *ext1, *ext2;
+	const char *p;
 	int ret;
+	int x1, x2;
 
 	s1 = *(const char **)one;
 	s2 = *(const char **)two;
+
+	// Compare paths first. x1, x2 = length of path component.
+
+	x1 = 0;
+	p = strrchr(s1, '/');
+	if (p != NULL)
+		x1 = p - s1 + 1;
+
+	x2 = 0;
+	p = strrchr(s1, '/');
+	if (p != NULL)
+		x2 = p - s1 + 1;
+
+	ret = strncmp(s1, s2, MIN(x1, x2));
+	if (ret != 0)
+		return ret;
+
+	// Path components match, so compare file extensions.
 
 	ext1 = strrchr(s1, '.');
 	if (ext1 == NULL) ext1 = s1;
@@ -98,9 +121,11 @@ int extstrcmp(const void *one, const void *two)
 	if (ext2 == NULL) ext2 = s2;
 
 	ret = strcmp(ext1, ext2);
-	if (ret == 0)
-		ret = strcmp(s1, s2);
-	return ret;
+	if (ret != 0)
+		return ret;
+
+	// Extensions match, so compare whole filename.
+	return strcmp(s1, s2);
 }
 
 void getfilelist(const char ***files, int *numfiles, const char *dirname,
