@@ -1,11 +1,5 @@
 Unimplemented:
- * ignoring files matching certain wildcards
-
-Untested:
- * -p, mark torrent as private
- * -q, quiet mode
- * -R, rename file or topdir
- * -b, custom piece size
+ * -i, ignoring files matching certain wildcards
 
 Limitations:
  * doesn't work on big endian systems yet
