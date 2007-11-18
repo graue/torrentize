@@ -29,7 +29,10 @@ static void usage(void)
 		"\n"
 		"-b, --piece-size KB: Set piece size in kilobytes.\n"
 		"-E, --sort-by-extensions: Sort by file extensions.\n"
-		"-i, --ignore pattern: Ignore wildcard pattern.\n"
+
+		// not implemented:
+		// "-i, --ignore pattern: Ignore wildcard pattern.\n"
+
 		"-o, --output-name file: Set output filename or directory.\n"
 		"-p, --private: Mark torrent private.\n"
 		"-q, --quiet: Don't print progress indicator.\n"

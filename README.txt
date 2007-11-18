@@ -23,6 +23,7 @@ Options:
   Set piece size in kilobytes. The default is 256 KB.
 
 
+(NOT IMPLEMENTED YET. IGNORE THIS ONE FOR NOW.)
 -i, --ignore pattern:
   Ignore files matching the given wildcard pattern (for
 example, *.txt). Matching is done case-sensitively. This
