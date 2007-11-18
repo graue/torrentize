@@ -5,3 +5,8 @@ Limitations:
  * doesn't work on big endian systems yet
  * with multi-tracker, only one tracker can be placed in each tier
  * skips over files that are symbolic links
+
+To add:
+ * -c comment: add comment
+ * -C file: add comment from file
+ * sha1sum for files
