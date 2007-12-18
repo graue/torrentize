@@ -13,3 +13,4 @@ To add:
 
 Bug:
  * Fucks up if you use a directory of "." for torrentizing.
+ * Fucks up if filesystem encoding is not UTF-8 (no conversion).
