@@ -9,7 +9,7 @@ torrentize [options] tracker_URL ... file ...
 
 Each file may be either a single file or a directory. The
 tracker_URLs and files are distinguished by the fact that a
-tracker_URL always starts with http:// or udp://.
+tracker_URL always starts with http://, https:// or udp://.
 
 The default name for a torrent file is the source file or
 directory with ".torrent" appended.

@@ -101,6 +101,7 @@ static void read_args(int argc, char *argv[])
 
 	tracker_urls = argv;
 	while (argc > 0 && (strncmp(*argv, "http://", 7) == 0
+			|| strncmp(*argv, "https://", 8) == 0
 			|| strncmp(*argv, "udp://", 6) == 0))
 	{
 		num_tracker_urls++;
