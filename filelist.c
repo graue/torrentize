@@ -1,7 +1,9 @@
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <dirent.h>
 #include <assert.h>
 #include "err.h"
@@ -30,12 +32,48 @@ static void add_dir(const char *dirname, const char *prefix)
 	while ((de = readdir(dh)) != NULL)
 	{
 		size_t namlen;
+		int filetype;
 
 		// TODO: check for wildcard match & skip
 
+		filetype = de->d_type;
 		namlen = strlen(de->d_name);
 
-		if (de->d_type == DT_REG)
+		// Handle symlinks to regular files (but not directories,
+		// since that could get us stuck in a loop), and handle
+		// "unknown" entries. On OpenBSD, I get "unknown" entries
+		// when working with an ext2fs partition.
+
+		// XXX: if the entry is "unknown" and turns out to be a
+		// symlink, it won't be followed
+
+		if (filetype == DT_UNKNOWN || filetype == DT_LNK)
+		{
+			struct stat info;
+
+			fname = xm(1, strlen(dirname) + 1 + namlen + 1);
+			sprintf(fname, "%s%s%s", dirname,
+				strlen(dirname) == 0 ? "" : "/", de->d_name);
+
+			if (stat(fname, &info) == -1)
+				warnx("\rcan't stat file %s, skipping", fname);
+			else if (filetype == DT_LNK && S_ISDIR(info.st_mode))
+			{
+				warnx("\rskipping symlinked directory %s",
+					fname);
+			}
+			else if (S_ISDIR(info.st_mode))
+				filetype = DT_DIR; // XXX
+			else if (S_ISREG(info.st_mode))
+				filetype = DT_REG; // XXX
+			else
+				warnx("\rskipping non-regular file %s", fname);
+
+			free(fname);
+			fname = NULL;
+		}
+
+		if (filetype == DT_REG)
 		{
 			fname = xm(1, strlen(prefix) + 1 + namlen + 1);
 			sprintf(fname, "%s%s%s", prefix,
@@ -43,7 +81,7 @@ static void add_dir(const char *dirname, const char *prefix)
 			XPND(fnams, nfnams, sfnams);
 			fnams[nfnams++] = fname;
 		}
-		else if (de->d_type == DT_DIR)
+		else if (filetype == DT_DIR)
 		{
 			if (strcmp(de->d_name, ".") == 0
 				|| strcmp(de->d_name, "..") == 0)
@@ -70,7 +108,7 @@ static void add_dir(const char *dirname, const char *prefix)
 				dirname,
 				strlen(dirname) == 0 ? "" : "/",
 				de->d_name,
-				de->d_type);
+				filetype);
 		}
 	}
 
