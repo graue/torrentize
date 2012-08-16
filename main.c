@@ -19,7 +19,8 @@ const struct option opts[] =
 	{ "output-name",	required_argument,	NULL, 'o' },
 	{ "private",		no_argument,		NULL, 'p' },
 	{ "quiet",		no_argument,		NULL, 'q' },
-	{ "rename",		required_argument,	NULL, 'R' }
+	{ "rename",		required_argument,	NULL, 'R' },
+	{ NULL,			0,			NULL,  0  }
 };
 
 static void usage(void)
