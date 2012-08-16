@@ -60,5 +60,5 @@ purely informational.
 Info:
 
 
-Torrentize was written by Graue <graue@oceanbase.org>. It is
+Torrentize was written by Scott Feeney <scott@oceanbase.org>. It is
 in the public domain.
