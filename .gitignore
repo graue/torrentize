@@ -1,2 +1,4 @@
 torrentize
 *.o
+*.swp
+*~
