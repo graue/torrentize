@@ -45,7 +45,7 @@ though.
 #include <errno.h>
 
 #ifdef LACK_PROGNAME
-char *__progname = "madsyn";
+char *__progname = "torrentize";
 #else
 extern char *__progname;
 #endif
