@@ -12,5 +12,5 @@ To add:
  * sha1sum for files
 
 Bug:
- * Fucks up if you use a directory of "." for torrentizing.
- * Fucks up if filesystem encoding is not UTF-8 (no conversion).
+ * Doesn't work correctly if you use a directory of "." for torrentizing.
+ * Doesn't work correctly if filesystem encoding is not UTF-8 (no conversion).
